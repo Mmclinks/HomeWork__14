@@ -2,21 +2,52 @@ class Product:
     def __init__(self, name: str, description: str, price: float, quantity: int):
         self.name = name
         self.description = description
-        self.price = price
+        self.__price = price
         self.quantity = quantity
+
+    @property
+    def price(self):
+        return self.__price
+
+    @price.setter
+    def price(self, value: float):
+        if value <= 0:
+            print("Цена не должна быть нулевая или отрицательная")
+        else:
+            self.__price = value
+
+    @classmethod
+    def new_product(cls, product_data: dict):
+        return cls(
+            name=product_data.get("name"),
+            description=product_data.get("description"),
+            price=product_data.get("price"),
+            quantity=product_data.get("quantity")
+        )
+
+    def __str__(self):
+        return f"{self.name}, {self.price} руб. Остаток: {self.quantity} шт."
 
 
 class Category:
     category_count = 0
     product_count = 0
 
-    def __init__(self, name: str, description: str, products: list[Product]):
+    def __init__(self, name: str, description: str, products: list[Product] = None):
         self.name = name
         self.description = description
-        self.products = products
+        self.__products = products if products is not None else []
 
         Category.category_count += 1
-        Category.product_count += len(products)
+        Category.product_count += len(self.__products)
+
+    def add_product(self, product: Product):
+        self.__products.append(product)
+        Category.product_count += 1
+
+    @property
+    def products(self):
+        return "\n".join(str(product) for product in self.__products)
 
 if __name__ == "__main__":
     product1 = Product("Samsung Galaxy S23 Ultra", "256GB, Серый цвет, 200MP камера", 180000.0, 5)
@@ -29,21 +60,24 @@ if __name__ == "__main__":
         [product1, product2, product3]
     )
 
-    print(category1.name)
-    print(category1.description)
-    print(len(category1.products))
-    print(Category.category_count)
-    print(Category.product_count)
-
+    print(category1.products)
     product4 = Product("55\" QLED 4K", "Фоновая подсветка", 123000.0, 7)
-    category2 = Category(
-        "Телевизоры",
-        "Современный телевизор, который позволяет наслаждаться просмотром, станет вашим другом и помощником",
-        [product4]
-    )
+    category1.add_product(product4)
+    print(category1.products)
+    print(category1.product_count)
 
-    print(category2.name)
-    print(category2.description)
-    print(len(category2.products))
-    print(Category.category_count)
-    print(Category.product_count)
+    new_product = Product.new_product(
+        {"name": "Samsung Galaxy S23 Ultra", "description": "256GB, Серый цвет, 200MP камера", "price": 180000.0,
+         "quantity": 5})
+    print(new_product.name)
+    print(new_product.description)
+    print(new_product.price)
+    print(new_product.quantity)
+
+    new_product.price = 800
+    print(new_product.price)
+
+    new_product.price = -100
+    print(new_product.price)
+    new_product.price = 0
+    print(new_product.price)
