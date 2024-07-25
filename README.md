@@ -34,11 +34,11 @@ poetry install
 Name                 Stmts   Miss  Cover
 ----------------------------------------
 src/__init__.py          0      0   100%
-src/main.py             32     16    50%
+src/main.py             55     20    64%
 tests/__init__.py        0      0   100%
-tests/test_main.py      46      0   100%
+tests/test_main.py      85      2    98%
 ----------------------------------------
-TOTAL                   78     16    79%
+TOTAL                  140     22    84%
 
 Лицензия:
 
