@@ -1,11 +1,13 @@
 import pytest
 from src.main import Product, Category
 
+
+# Сброс значений перед каждым тестом
 @pytest.fixture(autouse=True)
 def reset_category_and_product_counts():
-    # Сброс значений перед каждым тестом
     Category.category_count = 0
     Category.product_count = 0
+
 
 def test_product_initialization():
     product = Product("Test Product", "Test Description", 100.0, 10)
@@ -13,6 +15,7 @@ def test_product_initialization():
     assert product.description == "Test Description"
     assert product.price == 100.0
     assert product.quantity == 10
+
 
 def test_category_initialization():
     # Создаем продукты
@@ -30,6 +33,7 @@ def test_category_initialization():
     # Проверяем атрибуты класса Category
     assert Category.category_count == 1
     assert Category.product_count == 2
+
 
 def test_multiple_categories():
     # Создаем несколько продуктов
@@ -58,6 +62,7 @@ def test_multiple_categories():
     assert Category.category_count == 2
     assert Category.product_count == 2
 
+
 def test_product_list_in_category():
     # Создаем продукты
     product1 = Product("Product 1", "Description 1", 50.0, 10)
@@ -69,6 +74,7 @@ def test_product_list_in_category():
     # Проверяем список продуктов в категории
     assert category.products == "Product 1, 50.0 руб. Остаток: 10 шт.\nProduct 2, 150.0 руб. Остаток: 5 шт."
 
+
 def test_category_no_products():
     # Создаем категорию без продуктов
     category = Category("Empty Category", "Description", [])
@@ -79,17 +85,6 @@ def test_category_no_products():
     # Проверяем общее количество категорий и продуктов
     assert Category.category_count == 1
     assert Category.product_count == 0
-
-
-import pytest
-from src.main import Product, Category
-
-
-# Сброс значений перед каждым тестом
-@pytest.fixture(autouse=True)
-def reset_category_and_product_counts():
-    Category.category_count = 0
-    Category.product_count = 0
 
 
 def test_product_price_validation():
@@ -163,3 +158,30 @@ def test_category_and_product_counts():
     # Проверяем количество продуктов в конкретной категории
     assert category1.products == "Product 1, 100.0 руб. Остаток: 10 шт."
     assert category2.products == "Product 2, 200.0 руб. Остаток: 20 шт."
+
+
+# Новый функционал: строковое представление класса Category
+def test_category_str_representation():
+    product1 = Product("Product 1", "Description 1", 100.0, 10)
+    product2 = Product("Product 2", "Description 2", 200.0, 20)
+    category = Category("Category", "Description", [product1, product2])
+
+    # Проверяем строковое представление категории
+    assert str(category) == "Category, количество продуктов: 30 шт."
+
+
+# Новый функционал: сложение продуктов
+def test_product_addition():
+    product1 = Product("Product 1", "Description 1", 100.0, 10)
+    product2 = Product("Product 2", "Description 2", 200.0, 5)
+
+    # Проверяем результат сложения продуктов
+    assert product1 + product2 == 2000.0  # 100 * 10 + 200 * 5 = 2000
+
+    product3 = Product("Product 3", "Description 3", 300.0, 2)
+
+    # Проверяем результат сложения еще одного продукта
+    assert product1 + product3 == 1600.0  # 100 * 10 + 300 * 2 = 1600
+
+    # Проверяем сложение двух других продуктов
+    assert product2 + product3 == 1600.0  # 200 * 5 + 300 * 2 = 1600
