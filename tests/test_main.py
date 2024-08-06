@@ -1,8 +1,9 @@
 import pytest
+
 from src.main import Product, Category
+from src.main import Smartphone, LawnGrass
 
 
-# Сброс значений перед каждым тестом
 @pytest.fixture(autouse=True)
 def reset_category_and_product_counts():
     Category.category_count = 0
@@ -185,3 +186,78 @@ def test_product_addition():
 
     # Проверяем сложение двух других продуктов
     assert product2 + product3 == 1600.0  # 200 * 5 + 300 * 2 = 1600
+
+
+def test_product_price_setter():
+    p = Product(name="Test Product", description="A test product", price=100.0, quantity=10)
+    p.price = 150.0
+    assert p.price == 150.0
+    p.price = -10.0
+    assert p.price == 150.0  # Price should not change if invalid
+
+
+def test_product_addition_type_error():
+    p1 = Product(name="Product 1", description="Product 1 description", price=50.0, quantity=5)
+    p2 = "Not a Product"
+    with pytest.raises(TypeError):
+        p1 + p2
+
+
+def test_smartphone_initialization():
+    s = Smartphone(name="Samsung Galaxy", description="High-end smartphone", price=80000.0, quantity=5,
+                   efficiency=90.0, model="Galaxy S20", memory=128, color="Black")
+    assert s.name == "Samsung Galaxy"
+    assert s.description == "High-end smartphone"
+    assert s.price == 80000.0
+    assert s.quantity == 5
+    assert s.efficiency == 90.0
+    assert s.model == "Galaxy S20"
+    assert s.memory == 128
+    assert s.color == "Black"
+
+
+def test_smartphone_str():
+    s = Smartphone(name="Samsung Galaxy", description="High-end smartphone", price=80000.0, quantity=5,
+                   efficiency=90.0, model="Galaxy S20", memory=128, color="Black")
+    assert (
+            str(s) ==
+            "Samsung Galaxy, 80000.0 руб. Остаток: 5 шт. "
+            "| Модель: Galaxy S20, Память: 128 ГБ, Цвет: Black, Эффективность: 90.0"
+    )
+
+
+def test_lawn_grass_initialization():
+    g = LawnGrass(name="Premium Grass", description="High-quality grass", price=500.0, quantity=20,
+                  country="Russia", germination_period="7 days", color="Green")
+    assert g.name == "Premium Grass"
+    assert g.description == "High-quality grass"
+    assert g.price == 500.0
+    assert g.quantity == 20
+    assert g.country == "Russia"
+    assert g.germination_period == "7 days"
+    assert g.color == "Green"
+
+
+def test_lawn_grass_str():
+    g = LawnGrass(name="Premium Grass", description="High-quality grass", price=500.0, quantity=20,
+                  country="Russia", germination_period="7 days", color="Green")
+    assert (
+            str(g) ==
+            "Premium Grass, 500.0 руб. Остаток: 20 шт. | Страна: Russia, Срок прорастания: 7 days, Цвет: Green"
+    )
+
+
+def test_category_add_product():
+    c = Category(name="Electronics", description="All electronic items")
+    p = Product(name="Test Product", description="A test product", price=100.0, quantity=10)
+    c.add_product(p)
+    assert str(p) in c.products
+
+
+def test_new_product_method_empty_data():
+    product_data = {}
+    product = Product.new_product(product_data)
+    assert product.name is None
+    assert product.description is None
+    assert product.price is None
+    assert product.quantity is None
