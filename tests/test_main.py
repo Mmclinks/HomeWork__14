@@ -96,12 +96,12 @@ def test_product_price_validation():
     assert product.price == 150.0
 
     # Проверяем установку некорректной цены (отрицательной)
-    product.price = -50.0
-    assert product.price == 150.0  # Цена должна остаться прежней
+    with pytest.raises(ValueError, match="Цена не должна быть нулевая или отрицательная"):
+        product.price = -50.0
 
     # Проверяем установку некорректной цены (ноль)
-    product.price = 0.0
-    assert product.price == 150.0  # Цена должна остаться прежней
+    with pytest.raises(ValueError, match="Цена не должна быть нулевая или отрицательная"):
+        product.price = 0.0
 
 
 def test_new_product_method():
@@ -192,8 +192,9 @@ def test_product_price_setter():
     p = Product(name="Test Product", description="A test product", price=100.0, quantity=10)
     p.price = 150.0
     assert p.price == 150.0
-    p.price = -10.0
-    assert p.price == 150.0  # Price should not change if invalid
+
+    with pytest.raises(ValueError, match="Цена не должна быть нулевая или отрицательная"):
+        p.price = -10.0
 
 
 def test_product_addition_type_error():
@@ -261,3 +262,77 @@ def test_new_product_method_empty_data():
     assert product.description is None
     assert product.price is None
     assert product.quantity is None
+
+
+def test_category_str_representation_with_no_products():
+    # Проверка строки для категории без продуктов
+    category = Category("Empty Category", "No products here", [])
+    assert str(category) == "Empty Category, количество продуктов: 0 шт."
+
+
+def test_category_str_representation_with_products():
+    # Проверка строки для категории с продуктами
+    product1 = Product("Product 1", "Description 1", 100.0, 10)
+    product2 = Product("Product 2", "Description 2", 200.0, 5)
+    category = Category("Filled Category", "Some products", [product1, product2])
+    assert str(category) == "Filled Category, количество продуктов: 15 шт."
+
+
+def test_product_str_representation():
+    # Проверка строки для продукта
+    product = Product("Sample Product", "Sample Description", 150.0, 5)
+    assert str(product) == "Sample Product, 150.0 руб. Остаток: 5 шт."
+
+
+def test_product_additions():
+    # Проверка сложения продуктов
+    product1 = Product("Product 1", "Description 1", 100.0, 10)
+    product2 = Product("Product 2", "Description 2", 200.0, 5)
+    assert product1 + product2 == 2000.0  # 100*10 + 200*5 = 2000.0
+
+
+def test_product_addition_typeerror():
+    # Проверка ошибки при сложении продукта с другим типом данных
+    product1 = Product("Product 1", "Description 1", 100.0, 10)
+    with pytest.raises(TypeError):
+        result = product1 + "Not a Product"
+
+
+def test_smartphone_str_representation():
+    # Проверка строки для смартфона
+    smartphone = Smartphone(
+        name="iPhone 13",
+        description="Latest iPhone model",
+        price=80000.0,
+        quantity=10,
+        efficiency=95.0,
+        model="13 Pro",
+        memory=256,
+        color="Space Gray"
+    )
+    expected_str = ("iPhone 13, 80000.0 руб. Остаток: 10 шт. | Модель: 13 Pro, Память: 256 ГБ, Цвет: Space Gray, "
+                    "Эффективность: 95.0")
+    assert str(smartphone) == expected_str
+
+
+def test_lawn_grass_str_representation():
+    # Проверка строки для газона
+    lawn_grass = LawnGrass(
+        name="Premium Grass",
+        description="High-quality grass for lawns",
+        price=500.0,
+        quantity=20,
+        country="Russia",
+        germination_period="7 days",
+        color="Green"
+    )
+    expected_str = "Premium Grass, 500.0 руб. Остаток: 20 шт. | Страна: Russia, Срок прорастания: 7 days, Цвет: Green"
+    assert str(lawn_grass) == expected_str
+
+
+def test_category_add_product_updates_str():
+    # Проверка, что добавление продукта в категорию обновляет строковое представление
+    category = Category("Electronics", "All electronic items")
+    product = Product("Test Product", "A test product", 100.0, 10)
+    category.add_product(product)
+    assert str(category) == "Electronics, количество продуктов: 10 шт."
