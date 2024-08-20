@@ -1,6 +1,7 @@
 import pytest
 
-from src.main import Product, Category
+from src.main import Category
+from src.main import Product
 from src.main import Smartphone, LawnGrass
 
 
@@ -336,3 +337,64 @@ def test_category_add_product_updates_str():
     product = Product("Test Product", "A test product", 100.0, 10)
     category.add_product(product)
     assert str(category) == "Electronics, количество продуктов: 10 шт."
+
+
+def test_middle_price_with_products():
+    product1 = Product("Product 1", "Description 1", 100.0, 5)
+    product2 = Product("Product 2", "Description 2", 200.0, 3)
+    product3 = Product("Product 3", "Description 3", 300.0, 7)
+
+    category = Category("Test Category", "Description", [product1, product2, product3])
+
+    expected_average_price = (product1.price + product2.price + product3.price) / 3
+    assert category.middle_price() == expected_average_price, "Средняя цена рассчитана неверно"
+
+
+def test_middle_price_with_no_products():
+    category = Category("Empty Category", "No products")
+
+    assert category.middle_price() == 0, "Для пустой категории средняя цена должна быть 0"
+
+
+def test_middle_price_with_one_product():
+    product = Product("Single Product", "Description", 150.0, 10)
+
+    category = Category("Single Product Category", "Category with one product", [product])
+
+    assert category.middle_price() == product.price, ("Средняя цена для категории "
+                                                      "с одним продуктом должна быть равна цене этого продукта")
+
+
+def test_add_product_updates_average_price():
+    product1 = Product("Product 1", "Description 1", 100.0, 5)
+    category = Category("Test Category", "Description", [product1])
+
+    product2 = Product("Product 2", "Description 2", 200.0, 3)
+    category.add_product(product2)
+
+    expected_average_price = (product1.price + product2.price) / 2
+    assert category.middle_price() == expected_average_price, "Средняя цена не обновилась после добавления продукта"
+
+
+def test_zero_quantity_raises_value_error():
+    with pytest.raises(ValueError, match="Товар с нулевым количеством не может быть добавлен"):
+        Product("Invalid Product", "Description", 100.0, 0)
+
+
+def test_product_zero_quantity():
+    # Проверяем, что при создании продукта с нулевым количеством выбрасывается ValueError
+    with pytest.raises(ValueError, match="Товар с нулевым количеством не может быть добавлен"):
+        Product(name="Test Product", description="Test Description", price=100.0, quantity=0)
+
+
+def test_product_positive_quantity():
+    # Проверяем, что создание продукта с положительным количеством проходит без ошибок
+    try:
+        product = Product(name="Test Product", description="Test Description", price=100.0, quantity=10)
+    except ValueError:
+        pytest.fail("ValueError был неожиданно выброшен при создании продукта с положительным количеством")
+
+    assert product.name == "Test Product"
+    assert product.description == "Test Description"
+    assert product.price == 100.0
+    assert product.quantity == 10
